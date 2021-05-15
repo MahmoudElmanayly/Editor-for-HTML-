@@ -1,19 +1,18 @@
 
-#include <FL/Fl.H>
-#include <FL/Fl_Text_Buffer.H>
-#include <FL/fl_ask.H>
 
 #include "Globals.h"
 #include "Editors.h"
 
 //###################### Parent Class ###############################
 
-Editors::Editors(Fl_Text_Buffer* buf, int posX, int posY, int width, int height,
-	const char* fileName)
+
+Editors::Editors(int posX, int posY, int width, int height, const char* fileName)
 	: Fl_Text_Editor(posX, posY, width, height, fileName),
-	m_fileName{ fileName }
+	m_fileName{ fileName },
+	m_setName{ false }
 {
-	buffer(buf);
+	m_buffer = new Fl_Text_Buffer(g_initial_buffer_size);
+	buffer(m_buffer);
 	selection_color(FL_SELECTION_COLOR);
 	linenumber_width(g_line_number_width);
 	wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, Fl_Text_Display::WRAP_AT_COLUMN);
@@ -21,13 +20,31 @@ Editors::Editors(Fl_Text_Buffer* buf, int posX, int posY, int width, int height,
 
 Editors::~Editors() {}
 
+
+void Editors::setFileName(std::string fileName) {
+	m_setName = true;
+	this->m_fileName = fileName;
+	label(m_fileName.c_str());
+}
+
+const char* Editors::getFileName() const {
+	return m_fileName.c_str();
+}
+
+int Editors::saveFile() const {
+	int status = -1;
+	if (m_setName)
+		 status = this->m_buffer->savefile(this->m_fileName.c_str());
+	return status;
+}
+
 //################### End Parent Class #########################
 
 
 //################# Editor Child Class #########################
-Editor::Editor(Fl_Text_Buffer* editorBuffer, int posX, int posY, int width, int height,
-	const char* fileName)
-	:Editors(editorBuffer, posX, posY, width, height, fileName)
+
+Editor::Editor(int posX, int posY, int width, int height, const char* fileName)
+	:Editors(posX, posY, width, height, fileName)
 {
 	color(FL_DISPLAYER_BG_COLOR);
 	textcolor(FL_DISPLAYER_TXT_COLOR);
@@ -37,16 +54,33 @@ Editor::Editor(Fl_Text_Buffer* editorBuffer, int posX, int posY, int width, int 
 }
 
 Editor::~Editor() {}
+
+void Editor::loadFile(const char* filePath) {
+	auto* buf = buffer();
+	int status = buf->loadfile(filePath);
+	if (status != 0) {
+		fl_alert("Error: Could not Load File");
+	}
+	else {
+		setFileName(filePath);
+	}
+}
+
+void Editor::ConvertBtn_CB(Fl_Widget*, void*) {
+	
+}
 //############### End Editor Child Class #######################
 
 
 
 
 //############## Displayer Child Class #########################
-Displayer::Displayer(Fl_Text_Buffer* displayerBuffer, int posX, int posY, int width, int height,
-	const char* fileName)
-	:Editors(displayerBuffer, posX, posY, width, height, fileName)
+
+Displayer::Displayer(int posX, int posY, int width, int height, const char* fileName)
+	:Editors(posX, posY, width, height, fileName)
 {
+	m_setName = true;
+
 	color(FL_DISPLAYER_BG_COLOR);
 	textcolor(FL_DISPLAYER_TXT_COLOR);
 

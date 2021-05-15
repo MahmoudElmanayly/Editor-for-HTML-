@@ -1,9 +1,13 @@
 #pragma once
 
 //############### Includes #####################
+#include <iostream>
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Text_Display.H>
+#include <fl/Fl_Multiline_Output.H>
+#include <FL/Fl_File_Chooser.H>
+#include <FL/Fl_Native_File_Chooser.H>
 #include <FL/Fl_Text_Buffer.H>
 #include <FL/Fl_Text_Editor.H>
 #include <FL/Fl_Menu_Bar.H>
@@ -58,11 +62,3 @@ const unsigned g_initial_buffer_size = 200;
 
 //############ End RGB Colors ###############
 
-//######### functions fo menu bar ###########
-
-static void Change_CB(Fl_Widget* w, void*) {
-    fl_message("In the Call Back");
-}
-
-
-//####### end functions fo menu bar #########

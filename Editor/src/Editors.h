@@ -5,27 +5,37 @@
 #include <string>
 
 class Editors : public Fl_Text_Editor {
-private:
-	const char* m_fileName;
-	bool m_saved;
+protected:
+	std::string m_fileName;
+	bool m_setName;
+	Fl_Text_Buffer* m_buffer;
 
 public:
-	Editors(Fl_Text_Buffer* Buffer, int posX, int posY, int width, int height,
-		const char* fileName);
+	Editors(int posX, int posY, int width, int height, const char* fileName);
 	~Editors();
 
+	void setFileName(std::string fileName);
+	const char* getFileName() const;
+	int saveFile() const;
+	
 };
 
 class Editor : public Editors {
 public:
-	Editor(Fl_Text_Buffer* editorBuffer, int posX, int posY, int width, int height,
+	Editor(int posX, int posY, int width, int height,
 		const char* fileName);
 	~Editor();
+
+
+	void loadFile(const char* filePath);
+	static void ConvertBtn_CB(Fl_Widget*, void*);
 };
 
 class Displayer : public Editors {
 public:
-	Displayer(Fl_Text_Buffer* displayerBuffer, int posX, int posY, int width, int height,
+	Displayer(int posX, int posY, int width, int height,
 		const char* fileName);
 	~Displayer();
+
+	static void OpenBrowser_CB(Fl_Widget*, void*);
 };
