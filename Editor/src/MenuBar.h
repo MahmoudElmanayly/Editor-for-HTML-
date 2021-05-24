@@ -16,12 +16,20 @@ private:
 	void Save(Editors*);
 	static void Quit_CB(Fl_Widget*, void*);
 
-	static void SearchWord_CB(Fl_Widget*, void*);
-	static void FindReplace_CB(Fl_Widget*, void*);
+	
+	static void Find_CB(Fl_Widget*, void*);
+	static void FindBtn_CB(Fl_Widget*, void*);
+	static void ReplaceAllBtn_CB(Fl_Widget*, void*);
+	static void ReplaceNextBtn_CB(Fl_Widget*, void*);
 	static void Delete_CB(Fl_Widget*, void*);
 	static void SelectAll_CB(Fl_Widget*, void*);
+	static void SelectAllEditor_CB(Fl_Widget*, void*);
+	static void SelectAllDisplayer_CB(Fl_Widget*, void*);
 
 	static void ViewShortCuts_CB(Fl_Widget*, void*);
+
+	static void Run_CB(Fl_Widget*, void*);
+	static void OpenBrowser_CB(Fl_Widget*, void*);
 
 public:
 	Menu(unsigned menu_x, unsigned menu_y, unsigned menu_width, unsigned menu_height);

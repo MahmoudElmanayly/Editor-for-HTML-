@@ -38,6 +38,24 @@ int Editors::saveFile() const {
 	return status;
 }
 
+
+void Editors::Delete() {
+	if (this->m_setName) {
+		this->m_setName = false;
+		this->m_fileName = "No File Selected";
+		
+		int buffSize = this->m_buffer->length();
+		this->m_buffer->remove(0, buffSize - 1);
+		
+		std::string command = "del /f ";
+		command += m_fileName;
+		system(command.c_str());
+		
+		fl_message("The file has been deleted.");
+	}
+}
+
+
 //################### End Parent Class #########################
 
 
@@ -69,6 +87,65 @@ void Editor::loadFile(const char* filePath) {
 void Editor::ConvertBtn_CB(Fl_Widget*, void*) {
 	
 }
+
+void Editor::FindWord(const char* word) {
+	fl_message("In the find word function");
+	int pos = this->insert_position();
+	int found = this->m_buffer->search_forward(pos, word, &pos);
+	if (found) {
+		this->m_buffer->select(pos, pos + strlen(word));
+		this->insert_position(pos + strlen(word));
+		this->show_insert_position();
+	}
+	else {
+		fl_alert("No occurrences of \'%s\' found!", word);
+	}
+}
+
+void Editor::ReplaceAllWords(const char* oldWord, const char* neWord) {
+	this->insert_position(0);
+	int times = 0;
+
+	for (int found = 1; found; ) {
+		int pos = this->insert_position();
+		found = this->m_buffer->search_forward(pos, oldWord, &pos);
+
+		if (found) {
+			this->m_buffer->select(pos, pos + strlen(oldWord));
+			this->m_buffer->remove_selection();
+			this->m_buffer->insert(pos, neWord);
+			this->insert_position(pos + strlen(neWord));
+			this->show_insert_position();
+			times++;
+		}
+	}
+	if (times)
+		fl_message("Replaced %d occurrences.", times);
+	else
+		fl_message("No occurrences of \'%s\' found!", oldWord);
+}
+
+void Editor::ReplaceNextWord(const char* oldWord, const char* neWord) {
+	static int pos = -1;
+	if (pos == -1) {
+		this->insert_position(0);
+		pos = this->insert_position();
+	}
+
+	int found = this->m_buffer->search_forward(pos, oldWord, &pos);
+	if (found) {
+		this->m_buffer->select(pos, pos + strlen(oldWord));
+		this->m_buffer->remove_selection();
+		this->m_buffer->insert(pos, neWord);
+		this->insert_position(pos);
+		this->show_insert_position();
+	}
+	else {
+		fl_message("No occurrence of \'%s\' found!", oldWord);
+	}
+}
+
+
 //############### End Editor Child Class #######################
 
 

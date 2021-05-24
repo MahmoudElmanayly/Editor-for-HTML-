@@ -13,20 +13,18 @@ Menu::Menu(unsigned menu_x, unsigned menu_y, unsigned menu_width, unsigned menu_
     add("File/Load File", FL_CTRL+'l', LoadFile_CB, (void*)this);
     add("File/Save/New HTML Style File", FL_CTRL+'e', SavePlusPlus_CB, (void*)this);
     add("File/Save/Normal HTML File", FL_CTRL + 'h', SaveHtml_CB, (void*)this);
-    add("File/Save All", FL_CTRL+'a', SaveAll_CB, (void*)this);
+    add("File/Save All", FL_CTRL+'s', SaveAll_CB, (void*)this);
     add("File/Quit", FL_CTRL+'q', Quit_CB, (void*)this);
 
-    add("Edit/Search Word");
-    add("Edit/Find and Replace");
-    add("Edit/Delete/New HTML Style");
-    add("Edit/Delete/Normal HTML");
-    add("Edit/Select All/New HTML Style");
-    add("Edit/Select All/Normal HTML");
-
+    add("Edit/Find", FL_CTRL + 'f', Find_CB, (void*)this);
+    add("Edit/Delete/Editor", FL_CTRL + 'd', Delete_CB, (void*)this);
+    
+    
     add("View/Show Shortcuts");
 
-    add("Run/Generate Normal Html");
-    add("Run/Open Normal HTML File in a Browser");
+   /* add("Run/Generate Normal Html", FL_CTRL + 'r', Run_CB, (void*)this);
+    add("Run/Open Normal HTML File in a Browser", FL_CTRL + 'o', OpenBrowser_CB, (void*)this);
+    */
 }
 
 Menu::~Menu(){}
@@ -90,3 +88,70 @@ void Menu::Save(Editors* e) {
 void Menu::Quit_CB(Fl_Widget*, void*) {
     std::exit(0);
 }
+
+void Menu::Find_CB(Fl_Widget* w, void* object) {
+
+    Fl_Window* findWindow     = new Fl_Window(310, 105, "Find and Replace");
+    Fl_Input* WordInput       = new Fl_Input(70, 10, 210, 25, "Find");
+    Fl_Input* replaceInput    = new Fl_Input(70, 40, 210, 25, "Replace");
+    Fl_Button* findBtn        = new Fl_Button(10, 70, 90, 25, "Find");
+    Fl_Button* replaceAllBtn  = new Fl_Button(105, 70, 90, 25, "Replace All");
+    Fl_Button* replaceNextBtn = new Fl_Button(200, 70, 100, 25, "Replace Next");
+
+    findWindow->show();
+
+    findBtn->callback(FindBtn_CB, object);
+    replaceAllBtn->callback(ReplaceAllBtn_CB, object);
+    replaceNextBtn->callback(ReplaceNextBtn_CB, object);
+}
+
+void Menu::FindBtn_CB(Fl_Widget* input, void* object) {
+    auto* input1 = (Fl_Input*)input->parent()->child(0);
+    const char* word = input1->value();
+    if (word[0] == '\0') {
+        fl_alert("The word is blank!");
+        return;
+    }
+
+    Menu* menu = (Menu*)object;
+    menu->editor->FindWord(word);
+}
+
+void Menu::ReplaceAllBtn_CB(Fl_Widget* input, void* object) {
+    Fl_Input* input1 = (Fl_Input*)input->parent()->child(0);
+    Fl_Input* input2 = (Fl_Input*)input->parent()->child(1);
+    
+    const char* word = input1->value();
+    const char* neWord = input2->value();
+    
+    if (word[0] == '\0' ) {
+        fl_alert("You should enter a word to be replaced.");
+        return;
+    }
+
+    Menu* menu = (Menu*)object;
+    menu->editor->ReplaceAllWords(word, neWord);
+}
+
+void Menu::ReplaceNextBtn_CB(Fl_Widget* input, void* object) {
+    Fl_Input* input1 = (Fl_Input*)input->parent()->child(0);
+    Fl_Input* input2 = (Fl_Input*)input->parent()->child(1);
+    
+    const char* word = input1->value();
+    const char* neWord = input2->value();
+
+    if (word[0] == '\0') {
+        fl_alert("You should enter a word to be replaced.");
+        return;
+    }
+
+    Menu* menu = (Menu*)object;
+    menu->editor->ReplaceNextWord(word, neWord);
+}
+
+void Menu::Delete_CB(Fl_Widget*, void* object) {
+    Menu* menu = (Menu*)object;
+    menu->editor->Delete();
+    menu->displayer->Delete();
+}
+
